@@ -63,7 +63,10 @@ namespace TestBackgroundOps.Droid
         public void OnLocationChanged(Location location)
         {
 
-            Console.WriteLine(location.Latitude.ToString());
+            var intent = new Intent("com.monojit.development.TestBackgroundOps.LocationReceiver");
+            intent.PutExtra("lat", location.Latitude.ToString());
+            intent.PutExtra("lng", location.Longitude.ToString());
+            SendBroadcast(intent);
 
         }
 

@@ -74,6 +74,9 @@ namespace TestBackgroundOps.Droid
             // and attach an event to it
             Button button = FindViewById<Button>(Resource.Id.myButton);
 
+            RegisterReceiver(new LocationReceiver(),
+                             new IntentFilter("com.monojit.development.TestBackgroundOps.LocationReceiver"));
+
             button.Click +=  delegate
             {
 
@@ -83,6 +86,23 @@ namespace TestBackgroundOps.Droid
 
             };
         }
+    }
+
+    [BroadcastReceiver(Enabled = true, Exported = false)]
+    public class LocationReceiver : BroadcastReceiver
+    {
+
+        public override void OnReceive(Context context, Intent intent)
+        {
+
+            var latString = intent.GetStringExtra("lat");
+            var lngString = intent.GetStringExtra("lng");
+
+            Console.WriteLine($"Location:{latString}-{lngString}");
+
+
+        }
+
     }
 }
 
