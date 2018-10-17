@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Android;
 using Android.App;
 using Android.Content;
+using Android.Content.PM;
 using Android.Widget;
 using Android.OS;
 
@@ -47,6 +49,20 @@ namespace TestBackgroundOps.Droid
 
         }
 
+        private void StartForegroundService()
+        {
+
+
+            if (CheckSelfPermission(Manifest.Permission.AccessFineLocation) ==
+               Permission.Denied)
+                return;
+
+
+            var testIntent = new Intent(this, typeof(TestForegroundService));
+            StartForegroundService(testIntent);
+
+        }
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -61,7 +77,9 @@ namespace TestBackgroundOps.Droid
             button.Click +=  delegate
             {
 
-                StartIntentService();
+                // StartBindService()
+                // StartIntentService();
+                StartForegroundService();
 
             };
         }

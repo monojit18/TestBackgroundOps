@@ -9,7 +9,6 @@ using TestBackgroundOps;
 namespace TestBackgroundOps.Droid
 {
 
-
     [Service(Name = "com.monojit.development.TestBinderServie")]
     public class TestBinderService : Service
     {
