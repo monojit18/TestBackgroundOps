@@ -1,4 +1,8 @@
-﻿using Android.App;
+﻿using System;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Android.App;
+using Android.Content;
 using Android.Widget;
 using Android.OS;
 
@@ -8,6 +12,40 @@ namespace TestBackgroundOps.Droid
     public class MainActivity : Activity
     {
         int count = 1;
+
+        private TestConnection _testConnection;
+        private List<Intent> _intentsList;
+
+        private void StartBindService()
+        {
+
+            var testBkgdUploadTask = new TestBkgdUploadTask();
+            _testConnection = new TestConnection(this, testBkgdUploadTask);
+            var testIntent = new Intent(this, typeof(TestBinderService));
+
+            var couldBind = BindService(testIntent, _testConnection,
+                                        Bind.AutoCreate);
+            Console.WriteLine(couldBind.ToString());
+
+        }
+
+        private void StartIntentService()
+        {
+            _intentsList = new List<Intent>();
+
+            for (int i = 10, j = 10; i < 500; ++i, ++j)
+            {
+
+                var testIntent = new Intent(this, typeof(TestIntentService));
+                testIntent.PutExtra("width", i);
+                testIntent.PutExtra("height", j);
+                _intentsList.Add(testIntent);
+
+                StartService(testIntent);
+
+            }
+
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -20,7 +58,12 @@ namespace TestBackgroundOps.Droid
             // and attach an event to it
             Button button = FindViewById<Button>(Resource.Id.myButton);
 
-            button.Click += delegate { button.Text = $"{count++} clicks!"; };
+            button.Click +=  delegate
+            {
+
+                StartIntentService();
+
+            };
         }
     }
 }

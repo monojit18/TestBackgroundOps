@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -11,7 +12,6 @@ namespace TestBackgroundOps
 {
     public class TestBkgdDownloadTask
     {
-        private HttpClient _httpClient;
         private SemaphoreSlim _poolSemaphore;
         private SemaphoreSlim _chunkSemaphore;
         private CancellationTokenSource _tokenSource;
@@ -20,14 +20,20 @@ namespace TestBackgroundOps
         private async Task<byte[]> DownloadImageAsync(string segmentString)
         {
 
-            _httpClient = new HttpClient();
-            _tokenSource = new CancellationTokenSource();
-            _httpClient.BaseAddress = new Uri("https://placeholder.com/");
+            using (var httpClient = new HttpClient())
+            {
 
-            var httpResponse = await _httpClient.GetAsync(segmentString, _tokenSource.Token);
-            var imageBytes = await httpResponse.Content.ReadAsByteArrayAsync();
-            Console.WriteLine($"{segmentString}: " + imageBytes.Length.ToString());
-            return imageBytes;
+                _tokenSource = new CancellationTokenSource();
+                httpClient.BaseAddress = new Uri("https://placeholder.com/");
+
+                var httpResponse = await httpClient.GetAsync(segmentString,
+                                                             _tokenSource.Token);
+                var imageBytes = await httpResponse.Content.ReadAsByteArrayAsync();
+                Console.WriteLine($"{segmentString}: " + imageBytes.Length.ToString());
+                return imageBytes;
+
+            }
+
 
         }
 
@@ -118,6 +124,17 @@ namespace TestBackgroundOps
             var val = $"{_chunkIndex}x{_chunkIndex}";
             var imageBytes = await DownloadImageAsync(val);
             ++_chunkIndex;
+            return imageBytes.Length;
+
+        }
+
+        public async Task<int> SingleDownloadImageForSizeAsync(int width, int height)
+        {
+
+            var val = $"{width}x{height}";
+            await _poolSemaphore.WaitAsync();
+            var imageBytes = await DownloadImageAsync(val);
+            _poolSemaphore.Release();
             return imageBytes.Length;
 
         }

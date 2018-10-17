@@ -10,5 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)TestBkgdDownloadTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestBkgdUploadTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Item.cs" />
   </ItemGroup>
 </Project>
